@@ -1,10 +1,9 @@
 {
     "token": "TOKEN",
-	"guild": 1169680945016750160,
-	"channel": 1171729875531477012,
-	"message": 1192049044441272401,
-	"user": 1170803501413183559,
-	"owner": [1120654551331131452],
-	"log": 1169680945016750160,
-    "time-before-reload": 10 
+	"guild": "GUILD ID",
+	"channel": "CHANNEL ID",
+	"message": "DO NOT TOUCH",
+	"bot": "ID OF BOT",
+	"owner": ["User notify"],
+        "time-before-reload": 10 
 }
