@@ -16,22 +16,19 @@ async def on_ready():
             msg = None
         if msg:
             guild = bot.get_guild(config['guild'])
-            awabot = guild.get_member(config['user'])
+            awabot = guild.get_member(config['bot'])
             if awabot.status == discord.Status.online:
-                await msg.edit(embed=discord.Embed(title="Status", description=f"🟢 AwaBot est en ligne <t:{int(datetime.now().timestamp()) + 10}:R>", color=0x00ff00))
-                open("statut.json","w").write(json.dumps({"statut": True}))
+                await msg.edit(embed=discord.Embed(title="Status", description=f"🟢 AwaBot est en ligne <t:{int(datetime.now().timestamp()) + c['time-before-reload']}:R>", color=0x00ff00))
             else:
-                await msg.edit(embed=discord.Embed(title="Status", description=f"🔴 AwaBot est hors ligne <t:{int(datetime.now().timestamp()) + 10}:R>", color=0xff0000))
-                open("statut.json","w").write(json.dumps({"statut": False}))
+                await msg.edit(embed=discord.Embed(title="Status", description=f"🔴 AwaBot est hors ligne <t:{int(datetime.now().timestamp()) + c['time-before-reload']}:R>", color=0xff0000))
         else:
             guild = bot.get_guild(config['guild'])
             awabot = guild.get_member(config['user'])
             if awabot.status == discord.Status.online:
-                mseg=await channel.send(embed=discord.Embed(title="Status", description=f"🟢 {awabot.mention} est en ligne\n Prochain rechargement: <t:{int(datetime.now().timestamp()) + 10}:R>", color=0x00ff00))
-                open("config.json","w").write(json.dumps({"statut": True}))
+                mseg=await channel.send(embed=discord.Embed(title="Status", description=f"🟢 {awabot.mention} est en ligne\n Prochain rechargement: <t:{int(datetime.now().timestamp()) + c['time-before-reload']}:R>", color=0x00ff00))
             else:
-                mseg=await channel.send(embed=discord.Embed(title="Status", description=f"🔴 {awabot.mention} est hors ligne\n Prochain rechargement: <t:{int(datetime.now().timestamp()) + 10}:R> ", color=0xff0000))
-                open("statut.json","w").write(json.dumps({"statut": False}))
+                mseg=await channel.send(embed=discord.Embed(title="Status", description=f"🔴 {awabot.mention} est hors ligne\n Prochain rechargement: <t:{int(datetime.now().timestamp()) + c['time-before-reload']}:R> ", color=0xff0000))
+            
             new=json.dumps({"channel": channel.id, "message": mseg.id})
             f = open("config.json","w")
             f.write(new)
@@ -39,13 +36,12 @@ async def on_ready():
     if not check.is_running():
         
         check.start()
-
+        
 c = json.load(open("config.json","r")) 
 @tasks.loop(seconds=c['time-before-reload'])
 async def check():
     f = open("config.json","r")
     config = json.load(f)
-    stat = json.load(open("statut.json","r"))
     channel = bot.get_channel(config["channel"])
     if channel:
         try:
@@ -54,24 +50,15 @@ async def check():
             msg = None
         if msg:
             guild = bot.get_guild(config['guild'])
-            awabot = guild.get_member(config['user'])
+            awabot = guild.get_member(config['bot'])
             if awabot.status == discord.Status.online:
-                await msg.edit(embed=discord.Embed(title="Status", description=f"🟢 {awabot.mention} est en ligne\n Prochain rechargement: <t:{int(datetime.now().timestamp()) + 10}:R>", color=0x00ff00))
-                open("statut.json","w").write(json.dumps({"statut": True},indent=4))
+                await msg.edit(embed=discord.Embed(title="Status", description=f"🟢 {awabot.mention} est en ligne\n Prochain rechargement: <t:{int(datetime.now().timestamp()) + c['time-before-reload']}:R>", color=0x00ff00))
             else:
-                await msg.edit(embed=discord.Embed(title="Status", description=f"🔴 {awabot.mention} est hors ligne\n Prochain rechargement: <t:{int(datetime.now().timestamp()) + 10}:R>", color=0xff0000))
-                open("statut.json","w").write(json.dumps({"statut": False},indent=4))
+                await msg.edit(embed=discord.Embed(title="Status", description=f"🔴 {awabot.mention} est hors ligne\n Prochain rechargement: <t:{int(datetime.now().timestamp()) + c['time-before-reload']}:R>", color=0xff0000))
                 for users in config['owner']:
-                    user = await bot.get_member(users)
-                    await user.send(f"🔴 {awabot.mention} est hors ligne <t:{int(datetime.now().timestamp())}>")
-                if config.get("log"):
-                    if stat.get("statut"):
-                        log = bot.get_channel(config["log"])
-                        await log.send(f"🔴 {awabot.mention} est hors ligne <t:{int(datetime.now().timestamp())}>")
-                        
-                        open("statut.json","w").write(json.dumps({"statut": False},indent=4))
-                    else:
-                        log = bot.get_channel(config["log"])
-                        await log.send(f"🟢 {awabot.mention} est en ligne <t:{int(datetime.now().timestamp())}>")
-                        open("statut.json","w").write(json.dumps({"statut": True},indent=4))
+                    user = bot.get_user(users)
+                    await user.send(f"{awabot.mention} est hors ligne <t:{int(datetime.now().timestamp())}>")
+                    
+                    
+c = json.load(open("config.json","r"))
 bot.run(c['token'])
